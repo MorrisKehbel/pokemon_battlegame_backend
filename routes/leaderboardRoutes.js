@@ -6,20 +6,20 @@ import {
   getLeaderboardById,
   updateLeaderboard,
 } from "../controllers/leaderboardController.js";
-import validateBody from "../middlewares/validateSchema.js";
 import leaderboardSchema from "../zod/leaderboardSchema.js";
+import validateSchema from "../middlewares/validateSchema.js";
 
 const leaderboardRouter = Router();
 
 leaderboardRouter
   .route("/")
   .get(getAllLeaderboards)
-  .post(validateBody(leaderboardSchema), createLeaderboard);
+  .post(validateSchema(leaderboardSchema), createLeaderboard);
 
 leaderboardRouter
   .route("/:id")
   .get(getLeaderboardById)
-  .put(validateBody(leaderboardSchema), updateLeaderboard)
+  .put(validateSchema(leaderboardSchema), updateLeaderboard)
   .delete(deleteLeaderboard);
 
 export default leaderboardRouter;
