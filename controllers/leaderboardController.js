@@ -2,72 +2,80 @@ import Leaderboard from "../models/leaderboard.js";
 import { isValidObjectId } from "mongoose";
 
 export const getAllLeaderboards = async (req, res) => {
-  const leaderboards = await Leaderboard.find().sort({ score: -1, date: 1 });
-
-  if (!leaderboards || leaderboards.length === 0) {
-    throw new Error("No leaderboard entries found", { cause: 404 });
+  try {
+    const leaderboards = await Leaderboard.find().sort({ score: -1, date: 1 });
+    res.status(200).json(leaderboards);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
-
-  return res.status(200).json(leaderboards);
 };
 
 export const getLeaderboardById = async (req, res) => {
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
-    throw new Error("Invalid id", { cause: 400 });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
-  const leaderboard = await Leaderboard.findById(id);
-
-  if (!leaderboard) {
-    throw new Error("Leaderboard entry not found", { cause: 404 });
+  try {
+    const leaderboard = await Leaderboard.findById(id);
+    if (!leaderboard) {
+      return res.status(404).json({ error: "Leaderboard entry not found" });
+    }
+    res.status(200).json(leaderboard);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
-
-  return res.status(200).json(leaderboard);
 };
 
 export const createLeaderboard = async (req, res) => {
-  const { username, score, date } = req.sanitizedBody;
+  const { username, team, score, date } = req.body;
 
-  const newLeaderboard = await Leaderboard.create({ username, score, date });
-
-  return res.status(201).json(newLeaderboard);
+  try {
+    const newEntry = await Leaderboard.create({ username, team, score, date });
+    res.status(201).json(newEntry);
+  } catch (err) {
+    res.status(400).json({ error: "Invalid data", details: err.message });
+  }
 };
 
 export const updateLeaderboard = async (req, res) => {
-  const {
-    sanitizedBody,
-    params: { id },
-  } = req;
+  const { id } = req.params;
+  const { username, team, score, date } = req.body;
 
   if (!isValidObjectId(id)) {
-    throw new Error("Invalid id", { cause: 400 });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
-  const updated = await Leaderboard.findByIdAndUpdate(id, sanitizedBody, {
-    new: true,
-  });
-
-  if (!updated) {
-    throw new Error("Leaderboard entry not found", { cause: 404 });
+  try {
+    const updated = await Leaderboard.findByIdAndUpdate(
+      id,
+      { username, team, score, date },
+      { new: true }
+    );
+    if (!updated) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(400).json({ error: "Update failed", details: err.message });
   }
-
-  return res.status(200).json(updated);
 };
 
 export const deleteLeaderboard = async (req, res) => {
   const { id } = req.params;
 
   if (!isValidObjectId(id)) {
-    throw new Error("Invalid id", { cause: 400 });
+    return res.status(400).json({ error: "Invalid ID" });
   }
 
-  const deleted = await Leaderboard.findByIdAndDelete(id);
-
-  if (!deleted) {
-    throw new Error("Leaderboard entry not found", { cause: 404 });
+  try {
+    const deleted = await Leaderboard.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+    res.status(200).json({ message: "Entry deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
-
-  return res.status(200).json({ message: "Leaderboard entry deleted" });
 };
