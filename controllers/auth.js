@@ -13,9 +13,9 @@ const cookieOptions = {
 };
 
 const signUp = async (req, res) => {
-  const { username, team, score, date } = req.sanitizedBody;
+  const { username, team, enemy, score, date } = req.sanitizedBody;
 
-  const user = await Leaderboard.create({ username, team, score, date });
+  const user = await Leaderboard.create({ username, team, enemy, score, date });
 
   if (!isValidObjectId(user._id)) {
     throw new Error("Invalid id", { cause: 400 });
