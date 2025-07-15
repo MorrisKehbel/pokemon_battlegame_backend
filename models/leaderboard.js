@@ -11,6 +11,7 @@ const leaderboardSchema = new Schema({
   },
   enemy: {
     type: [String],
+    default: [],
   },
   score: {
     type: Number,
