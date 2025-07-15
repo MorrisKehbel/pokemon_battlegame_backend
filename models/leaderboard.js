@@ -9,6 +9,9 @@ const leaderboardSchema = new Schema({
     type: [String],
     required: true,
   },
+  enemy: {
+    type: [String],
+  },
   score: {
     type: Number,
     required: true,
