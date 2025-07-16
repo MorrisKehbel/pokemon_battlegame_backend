@@ -11,38 +11,43 @@ export const getAllLeaderboards = async (req, res) => {
   return res.status(200).json(leaderboards);
 };
 
-export const getLeaderboardById = async (req, res) => {
-  const { id } = req.params;
+// export const getLeaderboardById = async (req, res) => {
+//   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    throw new Error("Invalid id", { cause: 400 });
-  }
+//   if (!isValidObjectId(id)) {
+//     throw new Error("Invalid id", { cause: 400 });
+//   }
 
-  const leaderboard = await Leaderboard.findById(id);
+//   const leaderboard = await Leaderboard.findById(id);
 
-  if (!leaderboard) {
-    throw new Error("Leaderboard entry not found", { cause: 404 });
-  }
+//   if (!leaderboard) {
+//     throw new Error("Leaderboard entry not found", { cause: 404 });
+//   }
 
-  return res.status(200).json(leaderboard);
-};
+//   return res.status(200).json(leaderboard);
+// };
 
-export const createLeaderboard = async (req, res) => {
-  const { username, score, date } = req.sanitizedBody;
+// export const createLeaderboard = async (req, res) => {
+//   const { username, score, date } = req.sanitizedBody;
 
-  const newLeaderboard = await Leaderboard.create({ username, score, date });
+//   const newLeaderboard = await Leaderboard.create({ username, score, date });
 
-  return res.status(201).json(newLeaderboard);
-};
+//   return res.status(201).json(newLeaderboard);
+// };
 
 export const updateLeaderboard = async (req, res) => {
   const {
     sanitizedBody,
     params: { id },
+    userId,
   } = req;
 
   if (!isValidObjectId(id)) {
     throw new Error("Invalid id", { cause: 400 });
+  }
+
+  if (id !== userId) {
+    return res.status(403).json({ error: "Forbidden" });
   }
 
   const updated = await Leaderboard.findByIdAndUpdate(id, sanitizedBody, {
@@ -56,18 +61,18 @@ export const updateLeaderboard = async (req, res) => {
   return res.status(200).json(updated);
 };
 
-export const deleteLeaderboard = async (req, res) => {
-  const { id } = req.params;
+// export const deleteLeaderboard = async (req, res) => {
+//   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    throw new Error("Invalid id", { cause: 400 });
-  }
+//   if (!isValidObjectId(id)) {
+//     throw new Error("Invalid id", { cause: 400 });
+//   }
 
-  const deleted = await Leaderboard.findByIdAndDelete(id);
+//   const deleted = await Leaderboard.findByIdAndDelete(id);
 
-  if (!deleted) {
-    throw new Error("Leaderboard entry not found", { cause: 404 });
-  }
+//   if (!deleted) {
+//     throw new Error("Leaderboard entry not found", { cause: 404 });
+//   }
 
-  return res.status(200).json({ message: "Leaderboard entry deleted" });
-};
+//   return res.status(200).json({ message: "Leaderboard entry deleted" });
+// };
