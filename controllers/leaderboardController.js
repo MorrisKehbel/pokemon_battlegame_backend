@@ -28,31 +28,36 @@ export const getLeaderboardById = async (req, res) => {
   }
 };
 
-export const createLeaderboard = async (req, res) => {
-  const { username, team, score, date } = req.body;
+// export const createLeaderboard = async (req, res) => {
+//   const { username, team, score, date } = req.body;
 
-  try {
-    const newEntry = await Leaderboard.create({ username, team, score, date });
-    res.status(201).json(newEntry);
-  } catch (err) {
-    res.status(400).json({ error: "Invalid data", details: err.message });
-  }
-};
+//   try {
+//     const newEntry = await Leaderboard.create({ username, team, score, date });
+//     res.status(201).json(newEntry);
+//   } catch (err) {
+//     res.status(400).json({ error: "Invalid data", details: err.message });
+//   }
+// };
 
 export const updateLeaderboard = async (req, res) => {
-  const { id } = req.params;
-  const { username, team, score, date } = req.body;
+  const {
+    sanitizedBody,
+    params: { id },
+    userId,
+  } = req;
 
   if (!isValidObjectId(id)) {
     return res.status(400).json({ error: "Invalid ID" });
   }
 
+  if (id !== userId) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
   try {
-    const updated = await Leaderboard.findByIdAndUpdate(
-      id,
-      { username, team, score, date },
-      { new: true }
-    );
+    const updated = await Leaderboard.findByIdAndUpdate(id, sanitizedBody, {
+      new: true,
+    });
     if (!updated) {
       return res.status(404).json({ error: "Entry not found" });
     }
@@ -62,20 +67,20 @@ export const updateLeaderboard = async (req, res) => {
   }
 };
 
-export const deleteLeaderboard = async (req, res) => {
-  const { id } = req.params;
+// export const deleteLeaderboard = async (req, res) => {
+//   const { id } = req.params;
 
-  if (!isValidObjectId(id)) {
-    return res.status(400).json({ error: "Invalid ID" });
-  }
+//   if (!isValidObjectId(id)) {
+//     return res.status(400).json({ error: "Invalid ID" });
+//   }
 
-  try {
-    const deleted = await Leaderboard.findByIdAndDelete(id);
-    if (!deleted) {
-      return res.status(404).json({ error: "Entry not found" });
-    }
-    res.status(200).json({ message: "Entry deleted" });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
+//   try {
+//     const deleted = await Leaderboard.findByIdAndDelete(id);
+//     if (!deleted) {
+//       return res.status(404).json({ error: "Entry not found" });
+//     }
+//     res.status(200).json({ message: "Entry deleted" });
+//   } catch (err) {
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
